@@ -6,12 +6,15 @@
 #define SYSTEMSEX3A_FRACTION_H
 
 #include <ostream>
+#include "iostream"
 
 namespace ariel {
     class Fraction {
     private:
         int numerator;
         int denominator;
+        int gcdVal;
+        int lcmVal;
     public:
         Fraction(int numerator, int denominator);
 
@@ -93,7 +96,7 @@ namespace ariel {
 
         friend Fraction operator-(float scalar, const Fraction &other);
 
-        Fraction operator-(const Fraction& other);
+        Fraction operator-(const Fraction &other);
 
 
         // -= operator functions
@@ -106,7 +109,7 @@ namespace ariel {
 
         Fraction operator*(float scalar) const;
 
-        friend Fraction operator*(double scalar, const Fraction &other);
+        friend Fraction operator*(float scalar, const Fraction &other);
 
         // *= operator functions
         Fraction &operator*=(const Fraction &other);
@@ -118,9 +121,10 @@ namespace ariel {
 
         Fraction operator/(float scalar) const;
 
-        friend Fraction operator/(double scalar, const Fraction &other);
+        friend Fraction operator/(float scalar, const Fraction &other);
 
-        Fraction operator/(const Fraction& other);
+
+        Fraction operator/(const Fraction &other);
 
         // /= operator functions
         Fraction &operator/=(const Fraction &other);
@@ -145,6 +149,17 @@ namespace ariel {
 
         // overload >> input function
         friend std::istream &operator>>(std::istream &istream, Fraction &other);
+
+    private:
+        int LCM(int a, int b) const;
+
+        int GCD(int a, int b) const;
+
+        void setGCDAndLCM();
+
+        Fraction fractionMinus(const Fraction &other) const;
+
+        Fraction fractionDiv(const Fraction &other) const;
     };
 }
 

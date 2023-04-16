@@ -5,222 +5,303 @@
 #include "Fraction.hpp"
 
 namespace ariel {
-    Fraction::Fraction(int numerator, int denominator) : numerator(numerator), denominator(denominator) {}
-
-    Fraction::Fraction(const Fraction &fraction) {
-        this->numerator = 0;
-        this->denominator = 0;
+    Fraction::Fraction(int numerator, int denominator) : numerator(numerator), denominator(denominator), lcmVal(0),
+                                                         gcdVal(0) {
+        if (denominator == 0) {
+            throw std::runtime_error("division by 0");
+        }
+        setGCDAndLCM();
     }
 
-    Fraction::Fraction(float scalar) {
-        this->numerator = 0;
-        this->denominator = 0;
+    Fraction::Fraction(const Fraction &other) {
+        this->numerator = other.numerator;
+        this->denominator = other.denominator;
+        this->gcdVal = other.gcdVal;
+        this->lcmVal = other.lcmVal;
     }
 
-    Fraction &Fraction::operator=(const Fraction &other) {
-        return *this;
+    Fraction::Fraction(float number) : gcdVal(0), lcmVal(0) {
+        this->numerator = (int) number * 1000;
+        this->denominator = 1000;
     }
 
-    Fraction &Fraction::operator=(float scalar) {
+    Fraction &Fraction::operator=(const Fraction &other) = default;
+
+    Fraction &Fraction::operator=(float number) {
+        this->numerator = (int) number * 1000;
+        this->denominator = 1000;
+        this->gcdVal = 0;
+        this->lcmVal = 0;
         return *this;
     }
 
     Fraction &Fraction::operator=(Fraction &&other) noexcept {
+        this->numerator = other.numerator;
+        this->denominator = other.denominator;
+        other.numerator = 0;
+        other.numerator = 1;
         return *this;
     }
 
     Fraction::Fraction(Fraction &&other) noexcept {
         this->numerator = other.numerator;
         this->denominator = other.denominator;
+        this->gcdVal = other.gcdVal;
+        this->lcmVal = other.lcmVal;
     }
 
 
     Fraction::~Fraction() = default;
 
 
-// == operator functions
+    // == operator functions
     bool Fraction::operator==(const Fraction &other) const {
-        return false;
+        Fraction one(1, 1);
+        Fraction thisReducedForm = other / one;
+        Fraction otherReducedForm = *this / one;
+        return thisReducedForm.numerator == otherReducedForm.numerator &&
+               thisReducedForm.denominator == otherReducedForm.denominator;
     }
 
-    bool Fraction::operator==(float scalar) const {
-        return false;
+    bool Fraction::operator==(float number) const {
+        Fraction fraction(numerator);
+        return *this == fraction;
     }
 
-    bool operator==(float scalar, const Fraction &other) {
-        return false;
+    bool operator==(float number, const Fraction &other) {
+        const Fraction fraction(number);
+        return other == fraction;
     }
 
-// != operator functions
+    // != operator functions
     bool Fraction::operator!=(const Fraction &other) const {
-        return false;
+        return !(*this == other);
     }
 
-    bool Fraction::operator!=(float scalar) const {
-        return false;
+    bool Fraction::operator!=(float number) const {
+        const Fraction fraction(number);
+        return !(*this == fraction);
     }
 
-    bool operator!=(float scalar, const Fraction &other) {
-        return false;
+    bool operator!=(float number, const Fraction &other) {
+        const Fraction fraction(number);
+        return !(other == fraction);
     }
 
-// < operator functions
+    // < operator functions
     bool Fraction::operator<(const Fraction &other) const {
-        return false;
+        return numerator * other.denominator < other.numerator * denominator;
     }
 
-    bool Fraction::operator<(float scalar) const {
-        return false;
+    bool Fraction::operator<(float number) const {
+        Fraction numberFraction(number);
+        return *this < numberFraction;
     }
 
-    bool operator<(float scalar, const Fraction &other) {
-        return false;
+    bool operator<(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other < numberFraction;
     }
 
-// <= operator functions
+    // <= operator functions
     bool Fraction::operator<=(const Fraction &other) const {
-        return false;
+        return numerator * other.denominator <= other.numerator * denominator;
     }
 
-    bool Fraction::operator<=(float scalar) const {
-        return false;
+    bool Fraction::operator<=(float number) const {
+        Fraction numberFraction(number);
+        return *this <= numberFraction;
     }
 
-    bool operator<=(float scalar, const Fraction &other) {
-        return false;
+    bool operator<=(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other <= numberFraction;
     }
 
-// > operator functions
+    // > operator functions
     bool Fraction::operator>(const Fraction &other) const {
-        return false;
+        return numerator * other.denominator > other.numerator * denominator;
     }
 
-    bool Fraction::operator>(float scalar) const {
-        return false;
+    bool Fraction::operator>(float number) const {
+        Fraction numberFraction(number);
+        return *this > numberFraction;
     }
 
-    bool operator>(float scalar, const Fraction &other) {
-        return false;
+    bool operator>(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other > numberFraction;
     }
 
-// >= operator functions
+    // >= operator functions
     bool Fraction::operator>=(const Fraction &other) const {
-        return false;
+        return numerator * other.denominator >= other.numerator * denominator;
     }
 
-    bool Fraction::operator>=(float scalar) const {
-        return false;
+    bool Fraction::operator>=(float number) const {
+        Fraction numberFraction(number);
+        return *this >= numberFraction;
     }
 
-    bool operator>=(float scalar, const Fraction &other) {
-        return false;
+    bool operator>=(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other >= numberFraction;
     }
 
-// + operator functions
+    // + operator functions
     Fraction Fraction::operator+(const Fraction &other) const {
-        return {0, 0};
+        int newLCM = LCM(this->lcmVal, other.lcmVal);
+        int thisNumerator =
+                this->numerator * (newLCM / this->denominator) * (this->gcdVal / GCD(this->numerator, this->gcdVal));
+        int otherNumerator =
+                other.numerator * (newLCM / other.denominator) * (other.gcdVal / GCD(other.numerator, other.gcdVal));
+        int resultNumerator = thisNumerator + otherNumerator;
+        int gcdResult = GCD(resultNumerator, newLCM);
+        return {resultNumerator / gcdResult, newLCM / gcdResult};
     }
 
-    Fraction Fraction::operator+(float scalar) const {
-        return {0, 0};
+    Fraction Fraction::operator+(float number) const {
+        Fraction numberFraction(number);
+        return *this + numberFraction;
     }
 
-    Fraction operator+(float scalar, const Fraction &other) {
-        return {0, 0};
+    Fraction operator+(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other + numberFraction;
     }
 
-// += operator functions
+    // += operator functions
     Fraction &Fraction::operator+=(const Fraction &other) {
+        int newLCM = LCM(this->lcmVal, other.lcmVal);
+        int thisNumerator =
+                this->numerator * (newLCM / this->lcmVal) * (this->gcdVal / GCD(this->numerator, this->gcdVal));
+        int otherNumerator =
+                other.numerator * (newLCM / other.lcmVal) * (other.gcdVal / GCD(other.numerator, other.gcdVal));
+        int resultNumerator = thisNumerator + otherNumerator;
+        int gcdResult = GCD(resultNumerator, newLCM);
+        this->numerator = resultNumerator / gcdResult;
+        this->lcmVal = newLCM / gcdResult;
+        this->gcdVal = gcdResult;
         return *this;
     }
 
-    Fraction &Fraction::operator+=(float scalar) {
-        return *this;
+    Fraction &Fraction::operator+=(float number) {
+        Fraction numberFraction(number);
+        return *this += numberFraction;
     }
 
-// - operator functions
+    // - operator functions
     Fraction Fraction::operator-(const Fraction &other) const {
-        return {0, 0};
+        return fractionMinus(other);
     }
 
-    Fraction Fraction::operator-(float scalar) const {
-        return {0, 0};
+    Fraction Fraction::fractionMinus(const Fraction &other) const {
+        int lcm = LCM(denominator, other.denominator);
+        int thisNumerator = numerator * (lcm / denominator);
+        int otherNumerator = other.numerator * (lcm / other.denominator);
+        int resultNumerator = thisNumerator - otherNumerator;
+        int gcdResult = GCD(resultNumerator, lcm);
+        int newDenominator = 0;
+        if (lcm / gcdResult == 0) newDenominator = 1;
+        else newDenominator = lcm / gcdResult;
+        return {resultNumerator / gcdResult, newDenominator};
     }
 
-    Fraction operator-(float scalar, const Fraction &fraction) {
-        return {0, 0};
+    Fraction Fraction::operator-(float number) const {
+        Fraction numberFraction(number);
+        return *this - numberFraction;
     }
 
+    Fraction operator-(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other - numberFraction;
+    }
+
+    //f=a-b;
     Fraction Fraction::operator-(const Fraction &other) {
-        return {0, 0};
+        return fractionMinus(other);
     }
 
-// -= operator functions
+    // -= operator functions
     Fraction &Fraction::operator-=(const Fraction &other) {
         return *this;
     }
 
-    Fraction &Fraction::operator-=(float scalar) {
+    Fraction &Fraction::operator-=(float number) {
         return *this;
     }
 
-// * operator functions
+    // * operator functions
     Fraction Fraction::operator*(const Fraction &other) const {
-        return {0, 0};
+        int resultNumerator = this->numerator * other.numerator;
+        int resultDenominator = this->denominator * other.denominator;
+        int gcdResult = GCD(resultNumerator, resultDenominator);
+        return {resultNumerator / gcdResult, resultDenominator / gcdResult};
     }
 
-    Fraction Fraction::operator*(float scalar) const {
-        return {0, 0};
+    Fraction Fraction::operator*(float number) const {
+        Fraction numberFraction(number);
+        return *this * numberFraction;
     }
 
-    Fraction operator*(double scalar, const Fraction &other) {
-        return {0, 0};
+    Fraction operator*(float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other * numberFraction;
     }
 
 
-// *= operator functions
+    // *= operator functions
     Fraction &Fraction::operator*=(const Fraction &other) {
         return *this;
     }
 
-    Fraction &Fraction::operator*=(float scalar) {
+    Fraction &Fraction::operator*=(float number) {
         return *this;
     }
 
-// / operator functions
+    // / operator functions
     Fraction Fraction::operator/(const Fraction &other) const {
-        return {0, 0};
+        return fractionDiv(other);
     }
 
-    Fraction Fraction::operator/(float scalar) const {
-        return {0, 0};
+    Fraction Fraction::fractionDiv(const Fraction &other) const {
+        int resultNumerator = numerator * other.denominator;
+        int resultDenominator = denominator * other.numerator;
+        int gcdResult = GCD(resultNumerator, resultDenominator);
+        return {resultNumerator / gcdResult, resultDenominator / gcdResult};
     }
 
-    Fraction operator/(double scalar, const Fraction &other) {
-        return {0, 0};
+    Fraction Fraction::operator/(float number) const {
+        Fraction numberFraction(number);
+        return *this / numberFraction;
+    }
+
+    Fraction operator/(const float number, const Fraction &other) {
+        Fraction numberFraction(number);
+        return other / numberFraction;
     }
 
     Fraction Fraction::operator/(const Fraction &other) {
-        return {0, 0};
+        return fractionDiv(other);
     }
 
-// /= operator functions
+    // /= operator functions
     Fraction &Fraction::operator/=(const Fraction &other) {
         return *this;
     }
 
-    Fraction &Fraction::operator/=(const float scalar) {
+    Fraction &Fraction::operator/=(const float number) {
         return *this;
     }
 
-// ++fraction
+    // ++fraction
     Fraction &Fraction::operator++() {
         return *this;
     }
 
-// fraction++
+    // fraction++
     const Fraction Fraction::operator++(int) {
-        Fraction f(0, 0);
+        Fraction f(0, 1);
         return f;
     }
 
@@ -231,15 +312,33 @@ namespace ariel {
 
     // fraction--
     const Fraction Fraction::operator--(int) {
-        return {0, 0};
+        return {0, 1};
     }
 
     std::ostream &operator<<(std::ostream &ostream, const Fraction &fraction) {
-        return ostream;
+        return ostream << fraction.numerator << "/" << fraction.denominator;
     }
 
     std::istream &operator>>(std::istream &istream, Fraction &other) {
         return istream;
+    }
+
+    int Fraction::LCM(int a, int b) const {
+        return a * (b / GCD(a, b));
+    }
+
+    int Fraction::GCD(int a, int b) const {
+        if (b == 0) {
+            return a;
+        }
+        return GCD(b, a % b);
+    }
+
+    void Fraction::setGCDAndLCM() {
+        if (gcdVal == 0 || lcmVal == 0) {
+            gcdVal = GCD(numerator, denominator);
+            lcmVal = LCM(numerator, denominator);
+        }
     }
 
 }
