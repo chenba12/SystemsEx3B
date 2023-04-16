@@ -18,14 +18,14 @@ using namespace ariel;
 
 
 int main() {
-    const Fraction a(0, 1);
-    const Fraction b(1, 2);
-    Fraction c(1, 4);
-    Fraction d(3, 4);
-    Fraction e = a - a;
-    Fraction f = c - d;
-    cout << e << endl;
-    cout << f << endl;
+    const Fraction aaa(0, 1);
+    const Fraction bbb(1, 2);
+    Fraction ccc(1, 4);
+    Fraction ddd(3, 4);
+    Fraction eee = ccc-ccc;
+    Fraction fff = ccc - ddd;
+    cout << eee << endl;
+    cout << fff << endl;
 //    cout << "a: " << a << "b: " << b << endl;
 //    cout << "a+b" << a + b << endl;
 //    cout << "a-b" << a - b << endl;

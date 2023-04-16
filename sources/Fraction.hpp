@@ -96,9 +96,6 @@ namespace ariel {
 
         friend Fraction operator-(float scalar, const Fraction &other);
 
-        Fraction operator-(const Fraction &other);
-
-
         // -= operator functions
         Fraction &operator-=(const Fraction &other);
 
@@ -151,9 +148,9 @@ namespace ariel {
         friend std::istream &operator>>(std::istream &istream, Fraction &other);
 
     private:
-        int LCM(int a, int b) const;
+        static int LCM(int num, int den) ;
 
-        int GCD(int a, int b) const;
+        static int GCD(int num, int den) ;
 
         void setGCDAndLCM();
 

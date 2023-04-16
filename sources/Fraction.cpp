@@ -64,7 +64,7 @@ namespace ariel {
     }
 
     bool Fraction::operator==(float number) const {
-        Fraction fraction(numerator);
+        Fraction fraction(number);
         return *this == fraction;
     }
 
@@ -196,6 +196,9 @@ namespace ariel {
     }
 
     Fraction Fraction::fractionMinus(const Fraction &other) const {
+        if (this == &other) {
+            return {0, 1};
+        }
         int lcm = LCM(denominator, other.denominator);
         int thisNumerator = numerator * (lcm / denominator);
         int otherNumerator = other.numerator * (lcm / other.denominator);
@@ -215,11 +218,6 @@ namespace ariel {
     Fraction operator-(float number, const Fraction &other) {
         Fraction numberFraction(number);
         return other - numberFraction;
-    }
-
-    //f=a-b;
-    Fraction Fraction::operator-(const Fraction &other) {
-        return fractionMinus(other);
     }
 
     // -= operator functions
@@ -296,23 +294,28 @@ namespace ariel {
 
     // ++fraction
     Fraction &Fraction::operator++() {
-        return *this;
+        Fraction one(1, 1);
+        return *this += one;
     }
 
     // fraction++
     const Fraction Fraction::operator++(int) {
-        Fraction f(0, 1);
-        return f;
+        Fraction copy(*this);
+        numerator += denominator;
+        return copy;
     }
 
     // --fraction
     Fraction &Fraction::operator--() {
-        return *this;
+        Fraction one(1, 1);
+        return *this -= one;
     }
 
     // fraction--
     const Fraction Fraction::operator--(int) {
-        return {0, 1};
+        Fraction copy(*this);
+        numerator -= denominator;
+        return copy;
     }
 
     std::ostream &operator<<(std::ostream &ostream, const Fraction &fraction) {
@@ -323,15 +326,17 @@ namespace ariel {
         return istream;
     }
 
-    int Fraction::LCM(int a, int b) const {
-        return a * (b / GCD(a, b));
+    int Fraction::LCM(int num, int den) {
+        return num * (den / GCD(num, den));
     }
 
-    int Fraction::GCD(int a, int b) const {
-        if (b == 0) {
-            return a;
+    int Fraction::GCD(int num, int den) {
+        while (den != 0) {
+            int temp = den;
+            den = num % den;
+            num = temp;
         }
-        return GCD(b, a % b);
+        return num;
     }
 
     void Fraction::setGCDAndLCM() {
