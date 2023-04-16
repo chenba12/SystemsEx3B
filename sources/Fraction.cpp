@@ -328,6 +328,7 @@ namespace ariel {
         return ostream << fraction.numerator << "/" << fraction.denominator;
     }
 
+    //TODO fix
     std::istream &operator>>(std::istream &istream, Fraction &other) {
         int numerator = 0;
         int denominator = 1;
