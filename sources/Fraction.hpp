@@ -22,9 +22,9 @@ namespace ariel {
 
         Fraction &operator=(const Fraction &other);
 
-        Fraction &operator=(float scalar);
+        Fraction &operator=(float number);
 
-        explicit Fraction(float scalar);
+        explicit Fraction(float number);
 
         Fraction &operator=(Fraction &&other) noexcept;
 
@@ -37,21 +37,21 @@ namespace ariel {
         // == operator functions
         bool operator==(const Fraction &other) const;
 
-        bool operator==(float scalar) const;
+        bool operator==(float number) const;
 
         friend bool operator==(float scalar, const Fraction &other);
 
         // != operator functions
         bool operator!=(const Fraction &other) const;
 
-        bool operator!=(float scalar) const;
+        bool operator!=(float number) const;
 
         friend bool operator!=(float scalar, const Fraction &other);
 
         // < operator functions
         bool operator<(const Fraction &other) const;
 
-        bool operator<(float scalar) const;
+        bool operator<(float number) const;
 
         friend bool operator<(float scalar, const Fraction &other);
 
@@ -59,64 +59,64 @@ namespace ariel {
         // <= operator functions
         bool operator<=(const Fraction &other) const;
 
-        bool operator<=(float scalar) const;
+        bool operator<=(float number) const;
 
         friend bool operator<=(float scalar, const Fraction &other);
 
         // > operator functions
         bool operator>(const Fraction &other) const;
 
-        bool operator>(float scalar) const;
+        bool operator>(float number) const;
 
         friend bool operator>(float scalar, const Fraction &other);
 
         // >= operator functions
         bool operator>=(const Fraction &other) const;
 
-        bool operator>=(float scalar) const;
+        bool operator>=(float number) const;
 
         friend bool operator>=(float scalar, const Fraction &other);
 
         // + operator functions
         Fraction operator+(const Fraction &other) const;
 
-        Fraction operator+(float scalar) const;
+        Fraction operator+(float number) const;
 
         friend Fraction operator+(float scalar, const Fraction &other);
 
         // += operator functions
         Fraction &operator+=(const Fraction &other);
 
-        Fraction &operator+=(float scalar);
+        Fraction &operator+=(float number);
 
         // - operator functions
         Fraction operator-(const Fraction &other) const;
 
-        Fraction operator-(float scalar) const;
+        Fraction operator-(float number) const;
 
         friend Fraction operator-(float scalar, const Fraction &other);
 
         // -= operator functions
         Fraction &operator-=(const Fraction &other);
 
-        Fraction &operator-=(float scalar);
+        Fraction &operator-=(float number);
 
         // * operator functions
         Fraction operator*(const Fraction &other) const;
 
-        Fraction operator*(float scalar) const;
+        Fraction operator*(float number) const;
 
         friend Fraction operator*(float scalar, const Fraction &other);
 
         // *= operator functions
         Fraction &operator*=(const Fraction &other);
 
-        Fraction &operator*=(float scalar);
+        Fraction &operator*=(float number);
 
         // / operator functions
         Fraction operator/(const Fraction &other) const;
 
-        Fraction operator/(float scalar) const;
+        Fraction operator/(float number) const;
 
         friend Fraction operator/(float scalar, const Fraction &other);
 
@@ -126,7 +126,7 @@ namespace ariel {
         // /= operator functions
         Fraction &operator/=(const Fraction &other);
 
-        Fraction &operator/=(float scalar);
+        Fraction &operator/=(float number);
 
         // ++fraction
         Fraction &operator++();
@@ -148,9 +148,9 @@ namespace ariel {
         friend std::istream &operator>>(std::istream &istream, Fraction &other);
 
     private:
-        static int LCM(int num, int den) ;
+        static int LCM(int num, int den);
 
-        static int GCD(int num, int den) ;
+        static int GCD(int num, int den);
 
         void setGCDAndLCM();
 

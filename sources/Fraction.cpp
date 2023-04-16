@@ -204,7 +204,7 @@ namespace ariel {
         int otherNumerator = other.numerator * (lcm / other.denominator);
         int resultNumerator = thisNumerator - otherNumerator;
         int gcdResult = GCD(resultNumerator, lcm);
-        int newDenominator = 0;
+        int newDenominator;
         if (lcm / gcdResult == 0) newDenominator = 1;
         else newDenominator = lcm / gcdResult;
         return {resultNumerator / gcdResult, newDenominator};
@@ -222,11 +222,13 @@ namespace ariel {
 
     // -= operator functions
     Fraction &Fraction::operator-=(const Fraction &other) {
+        *this = *this - other;
         return *this;
     }
 
     Fraction &Fraction::operator-=(float number) {
-        return *this;
+        Fraction numberFraction(number);
+        return *this -= numberFraction;
     }
 
     // * operator functions
@@ -250,11 +252,13 @@ namespace ariel {
 
     // *= operator functions
     Fraction &Fraction::operator*=(const Fraction &other) {
+        *this = *this * other;
         return *this;
     }
 
     Fraction &Fraction::operator*=(float number) {
-        return *this;
+        Fraction numberFraction(number);
+        return *this *= numberFraction;
     }
 
     // / operator functions
@@ -285,11 +289,13 @@ namespace ariel {
 
     // /= operator functions
     Fraction &Fraction::operator/=(const Fraction &other) {
+        *this = *this / other;
         return *this;
     }
 
     Fraction &Fraction::operator/=(const float number) {
-        return *this;
+        Fraction numberFraction(number);
+        return *this /= numberFraction;
     }
 
     // ++fraction
@@ -323,6 +329,41 @@ namespace ariel {
     }
 
     std::istream &operator>>(std::istream &istream, Fraction &other) {
+        int numerator = 0;
+        int denominator = 1;
+        int sign = 1;
+        bool inNumerator = true;
+        char c;
+        while (istream.get(c)) {
+            if (c == '-') {
+                if (inNumerator) {
+                    sign = -1;
+                } else {
+                    istream.putback(c);
+                    break;
+                }
+            } else if (c >= '0' && c <= '9') {
+                if (inNumerator) {
+                    numerator = numerator * 10 + (c - '0');
+                } else {
+                    denominator = denominator * 10 + (c - '0');
+                }
+            } else if (c == '/') {
+                inNumerator = false;
+            } else {
+                istream.putback(c);
+                break;
+            }
+        }
+
+        numerator *= sign;
+
+        if (denominator == 0) {
+            throw std::invalid_argument("Invalid fraction: division by zero");
+        }
+
+        other = Fraction(numerator, denominator);
+
         return istream;
     }
 
