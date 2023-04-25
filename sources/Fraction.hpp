@@ -16,15 +16,17 @@ namespace ariel {
         int gcdVal;
         int lcmVal;
     public:
+        Fraction();
+
         Fraction(int numerator, int denominator);
 
         Fraction(const Fraction &other);
 
+        explicit Fraction(float number);
+
         Fraction &operator=(const Fraction &other);
 
         Fraction &operator=(float number);
-
-        explicit Fraction(float number);
 
         Fraction &operator=(Fraction &&other) noexcept;
 
@@ -32,28 +34,28 @@ namespace ariel {
 
         ~Fraction();
 
-        // fraction vs fraction comparison operators
+        // comparison operators
 
         // == operator functions
         bool operator==(const Fraction &other) const;
 
         bool operator==(float number) const;
 
-        friend bool operator==(float scalar, const Fraction &other);
+        friend bool operator==(float number, const Fraction &other);
 
         // != operator functions
         bool operator!=(const Fraction &other) const;
 
         bool operator!=(float number) const;
 
-        friend bool operator!=(float scalar, const Fraction &other);
+        friend bool operator!=(float number, const Fraction &other);
 
         // < operator functions
         bool operator<(const Fraction &other) const;
 
         bool operator<(float number) const;
 
-        friend bool operator<(float scalar, const Fraction &other);
+        friend bool operator<(float number, const Fraction &other);
 
 
         // <= operator functions
@@ -61,28 +63,28 @@ namespace ariel {
 
         bool operator<=(float number) const;
 
-        friend bool operator<=(float scalar, const Fraction &other);
+        friend bool operator<=(float number, const Fraction &other);
 
         // > operator functions
         bool operator>(const Fraction &other) const;
 
         bool operator>(float number) const;
 
-        friend bool operator>(float scalar, const Fraction &other);
+        friend bool operator>(float number, const Fraction &other);
 
         // >= operator functions
         bool operator>=(const Fraction &other) const;
 
         bool operator>=(float number) const;
 
-        friend bool operator>=(float scalar, const Fraction &other);
+        friend bool operator>=(float number, const Fraction &other);
 
         // + operator functions
         Fraction operator+(const Fraction &other) const;
 
         Fraction operator+(float number) const;
 
-        friend Fraction operator+(float scalar, const Fraction &other);
+        friend Fraction operator+(float number, const Fraction &other);
 
         // += operator functions
         Fraction &operator+=(const Fraction &other);
@@ -94,7 +96,7 @@ namespace ariel {
 
         Fraction operator-(float number) const;
 
-        friend Fraction operator-(float scalar, const Fraction &other);
+        friend Fraction operator-(float number, const Fraction &other);
 
         // -= operator functions
         Fraction &operator-=(const Fraction &other);
@@ -106,7 +108,7 @@ namespace ariel {
 
         Fraction operator*(float number) const;
 
-        friend Fraction operator*(float scalar, const Fraction &other);
+        friend Fraction operator*(float number, const Fraction &other);
 
         // *= operator functions
         Fraction &operator*=(const Fraction &other);
@@ -118,7 +120,7 @@ namespace ariel {
 
         Fraction operator/(float number) const;
 
-        friend Fraction operator/(float scalar, const Fraction &other);
+        friend Fraction operator/(float number, const Fraction &other);
 
 
         Fraction operator/(const Fraction &other);
@@ -147,16 +149,17 @@ namespace ariel {
         // overload >> input function
         friend std::istream &operator>>(std::istream &istream, Fraction &other);
 
+        void reduce();
+
     private:
         static int LCM(int num, int den);
 
         static int GCD(int num, int den);
 
-        void setGCDAndLCM();
-
         Fraction fractionMinus(const Fraction &other) const;
 
         Fraction fractionDiv(const Fraction &other) const;
+
     };
 }
 

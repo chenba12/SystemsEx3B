@@ -5,14 +5,30 @@
 #include "Fraction.hpp"
 
 namespace ariel {
+
+    /**
+     * empty constructor
+     */
+    Fraction::Fraction() : numerator(0), denominator(1), gcdVal(0), lcmVal(0) {
+
+    }
+
+    /**
+     * basic constructor that get 2 ints
+     * @param numerator
+     * @param denominator
+     */
     Fraction::Fraction(int numerator, int denominator) : numerator(numerator), denominator(denominator), lcmVal(0),
                                                          gcdVal(0) {
         if (denominator == 0) {
-            throw std::runtime_error("division by 0");
+            throw std::logic_error("division by 0");
         }
-        setGCDAndLCM();
     }
 
+    /**
+     * copy constructor
+     * @param other fraction to copy from
+     */
     Fraction::Fraction(const Fraction &other) {
         this->numerator = other.numerator;
         this->denominator = other.denominator;
@@ -20,12 +36,23 @@ namespace ariel {
         this->lcmVal = other.lcmVal;
     }
 
+    /**
+     * float constructor
+     * @param number
+     */
     Fraction::Fraction(float number) : gcdVal(0), lcmVal(0) {
-        this->numerator = (int) number * 1000;
+        this->numerator = (int) (number * 1000);
         this->denominator = 1000;
+        reduce();
     }
 
+    /**
+     *  assigment operator constructor
+     * @param other fraction
+     * @return
+     */
     Fraction &Fraction::operator=(const Fraction &other) = default;
+
 
     Fraction &Fraction::operator=(float number) {
         this->numerator = (int) number * 1000;
@@ -35,6 +62,12 @@ namespace ariel {
         return *this;
     }
 
+    /**
+     *  assigment move operator copy the fields of the other fraction into this
+     *  and change the other fraction to 0/1 (default fraction)
+     * @param other fraction
+     * @return
+     */
     Fraction &Fraction::operator=(Fraction &&other) noexcept {
         this->numerator = other.numerator;
         this->denominator = other.denominator;
@@ -43,6 +76,10 @@ namespace ariel {
         return *this;
     }
 
+    /**
+     * move
+     * @param other
+     */
     Fraction::Fraction(Fraction &&other) noexcept {
         this->numerator = other.numerator;
         this->denominator = other.denominator;
@@ -50,17 +87,21 @@ namespace ariel {
         this->lcmVal = other.lcmVal;
     }
 
-
+    /**
+     * destructor
+     */
     Fraction::~Fraction() = default;
 
+    /**
+     * used < to implement the rest of the comparison operators
+     * >, < ,== ,!= ,>= ,<=
+     */
 
-    // == operator functions
+    /**
+     * == operator functions
+     */
     bool Fraction::operator==(const Fraction &other) const {
-        Fraction one(1, 1);
-        Fraction thisReducedForm = other / one;
-        Fraction otherReducedForm = *this / one;
-        return thisReducedForm.numerator == otherReducedForm.numerator &&
-               thisReducedForm.denominator == otherReducedForm.denominator;
+        return !(*this < other) && !(other < *this);
     }
 
     bool Fraction::operator==(float number) const {
@@ -73,7 +114,9 @@ namespace ariel {
         return other == fraction;
     }
 
-    // != operator functions
+    /**
+     * != operator functions
+     */
     bool Fraction::operator!=(const Fraction &other) const {
         return !(*this == other);
     }
@@ -88,9 +131,11 @@ namespace ariel {
         return !(other == fraction);
     }
 
-    // < operator functions
+    /**
+     * < operator functions
+     */
     bool Fraction::operator<(const Fraction &other) const {
-        return numerator * other.denominator < other.numerator * denominator;
+        return this->numerator * other.denominator < other.numerator * this->denominator;
     }
 
     bool Fraction::operator<(float number) const {
@@ -103,9 +148,11 @@ namespace ariel {
         return other < numberFraction;
     }
 
-    // <= operator functions
+    /**
+     * <= operator functions
+     */
     bool Fraction::operator<=(const Fraction &other) const {
-        return numerator * other.denominator <= other.numerator * denominator;
+        return !(*this > other);
     }
 
     bool Fraction::operator<=(float number) const {
@@ -118,9 +165,11 @@ namespace ariel {
         return other <= numberFraction;
     }
 
-    // > operator functions
+    /**
+     * > operator functions
+     */
     bool Fraction::operator>(const Fraction &other) const {
-        return numerator * other.denominator > other.numerator * denominator;
+        return !(*this < other);
     }
 
     bool Fraction::operator>(float number) const {
@@ -133,9 +182,11 @@ namespace ariel {
         return other > numberFraction;
     }
 
-    // >= operator functions
+    /**
+     * >= operator functions
+     */
     bool Fraction::operator>=(const Fraction &other) const {
-        return numerator * other.denominator >= other.numerator * denominator;
+        return !(*this < other);
     }
 
     bool Fraction::operator>=(float number) const {
@@ -148,16 +199,15 @@ namespace ariel {
         return other >= numberFraction;
     }
 
-    // + operator functions
+    /**
+     * + operator functions
+     */
     Fraction Fraction::operator+(const Fraction &other) const {
-        int newLCM = LCM(this->lcmVal, other.lcmVal);
-        int thisNumerator =
-                this->numerator * (newLCM / this->denominator) * (this->gcdVal / GCD(this->numerator, this->gcdVal));
-        int otherNumerator =
-                other.numerator * (newLCM / other.denominator) * (other.gcdVal / GCD(other.numerator, other.gcdVal));
-        int resultNumerator = thisNumerator + otherNumerator;
-        int gcdResult = GCD(resultNumerator, newLCM);
-        return {resultNumerator / gcdResult, newLCM / gcdResult};
+        int resultNumerator = numerator * other.denominator + other.numerator * denominator;
+        int resultDenominator = denominator * other.denominator;
+        Fraction result(resultNumerator, resultDenominator);
+        result.reduce();
+        return result;
     }
 
     Fraction Fraction::operator+(float number) const {
@@ -170,18 +220,11 @@ namespace ariel {
         return other + numberFraction;
     }
 
-    // += operator functions
+    /**
+     * += operator functions
+     */
     Fraction &Fraction::operator+=(const Fraction &other) {
-        int newLCM = LCM(this->lcmVal, other.lcmVal);
-        int thisNumerator =
-                this->numerator * (newLCM / this->lcmVal) * (this->gcdVal / GCD(this->numerator, this->gcdVal));
-        int otherNumerator =
-                other.numerator * (newLCM / other.lcmVal) * (other.gcdVal / GCD(other.numerator, other.gcdVal));
-        int resultNumerator = thisNumerator + otherNumerator;
-        int gcdResult = GCD(resultNumerator, newLCM);
-        this->numerator = resultNumerator / gcdResult;
-        this->lcmVal = newLCM / gcdResult;
-        this->gcdVal = gcdResult;
+        *this = *this + other;
         return *this;
     }
 
@@ -190,7 +233,9 @@ namespace ariel {
         return *this += numberFraction;
     }
 
-    // - operator functions
+    /**
+     * - operator functions
+     */
     Fraction Fraction::operator-(const Fraction &other) const {
         return fractionMinus(other);
     }
@@ -199,15 +244,11 @@ namespace ariel {
         if (this == &other) {
             return {0, 1};
         }
-        int lcm = LCM(denominator, other.denominator);
-        int thisNumerator = numerator * (lcm / denominator);
-        int otherNumerator = other.numerator * (lcm / other.denominator);
-        int resultNumerator = thisNumerator - otherNumerator;
-        int gcdResult = GCD(resultNumerator, lcm);
-        int newDenominator;
-        if (lcm / gcdResult == 0) newDenominator = 1;
-        else newDenominator = lcm / gcdResult;
-        return {resultNumerator / gcdResult, newDenominator};
+        int resultNumerator = numerator * other.denominator - other.numerator * denominator;
+        int resultDenominator = denominator * other.denominator;
+        Fraction result(resultNumerator, resultDenominator);
+        result.reduce();
+        return result;
     }
 
     Fraction Fraction::operator-(float number) const {
@@ -220,7 +261,9 @@ namespace ariel {
         return other - numberFraction;
     }
 
-    // -= operator functions
+    /**
+     * -= operator functions
+     */
     Fraction &Fraction::operator-=(const Fraction &other) {
         *this = *this - other;
         return *this;
@@ -231,12 +274,15 @@ namespace ariel {
         return *this -= numberFraction;
     }
 
-    // * operator functions
+    /**
+     * * operator functions
+     */
     Fraction Fraction::operator*(const Fraction &other) const {
-        int resultNumerator = this->numerator * other.numerator;
-        int resultDenominator = this->denominator * other.denominator;
-        int gcdResult = GCD(resultNumerator, resultDenominator);
-        return {resultNumerator / gcdResult, resultDenominator / gcdResult};
+        int resultNumerator = numerator * other.numerator;
+        int resultDenominator = denominator * other.denominator;
+        Fraction result(resultNumerator, resultDenominator);
+        result.reduce();
+        return result;
     }
 
     Fraction Fraction::operator*(float number) const {
@@ -250,7 +296,9 @@ namespace ariel {
     }
 
 
-    // *= operator functions
+    /**
+     * *= operator functions
+     */
     Fraction &Fraction::operator*=(const Fraction &other) {
         *this = *this * other;
         return *this;
@@ -261,7 +309,9 @@ namespace ariel {
         return *this *= numberFraction;
     }
 
-    // / operator functions
+    /**
+     * / operator functions
+     */
     Fraction Fraction::operator/(const Fraction &other) const {
         return fractionDiv(other);
     }
@@ -269,8 +319,9 @@ namespace ariel {
     Fraction Fraction::fractionDiv(const Fraction &other) const {
         int resultNumerator = numerator * other.denominator;
         int resultDenominator = denominator * other.numerator;
-        int gcdResult = GCD(resultNumerator, resultDenominator);
-        return {resultNumerator / gcdResult, resultDenominator / gcdResult};
+        Fraction result(resultNumerator, resultDenominator);
+        result.reduce();
+        return result;
     }
 
     Fraction Fraction::operator/(float number) const {
@@ -287,7 +338,9 @@ namespace ariel {
         return fractionDiv(other);
     }
 
-    // /= operator functions
+    /**
+     * /= operator functions
+     */
     Fraction &Fraction::operator/=(const Fraction &other) {
         *this = *this / other;
         return *this;
@@ -298,80 +351,102 @@ namespace ariel {
         return *this /= numberFraction;
     }
 
-    // ++fraction
+    /**
+     * ++fraction
+     */
     Fraction &Fraction::operator++() {
         Fraction one(1, 1);
         return *this += one;
     }
 
-    // fraction++
+    /**
+     * fraction++
+     */
     const Fraction Fraction::operator++(int) {
         Fraction copy(*this);
         numerator += denominator;
         return copy;
     }
 
-    // --fraction
+    /**
+     * --fraction
+     */
     Fraction &Fraction::operator--() {
         Fraction one(1, 1);
         return *this -= one;
     }
 
-    // fraction--
+    /**
+     * fraction--
+     */
     const Fraction Fraction::operator--(int) {
         Fraction copy(*this);
         numerator -= denominator;
         return copy;
     }
 
+    /**
+     * print the fraction to the terminal as x/y
+     * @param ostream
+     * @param fraction to print
+     * @return the ostream
+     */
     std::ostream &operator<<(std::ostream &ostream, const Fraction &fraction) {
         return ostream << fraction.numerator << "/" << fraction.denominator;
     }
 
-    //TODO fix
+    /**
+     * overload the >> operator
+     * checks if the input includes / if it does take both numbers and set them as numerator and denominator
+     * if there is no / use the float ctor
+     * @param istream
+     * @param other the fraction that will hold the input value
+     * @return the istream
+     */
     std::istream &operator>>(std::istream &istream, Fraction &other) {
-        int numerator = 0;
-        int denominator = 1;
-        int sign = 1;
-        bool inNumerator = true;
-        char c;
-        while (istream.get(c)) {
-            if (c == '-') {
-                if (inNumerator) {
-                    sign = -1;
-                } else {
-                    istream.putback(c);
-                    break;
-                }
-            } else if (c >= '0' && c <= '9') {
-                if (inNumerator) {
-                    numerator = numerator * 10 + (c - '0');
-                } else {
-                    denominator = denominator * 10 + (c - '0');
-                }
-            } else if (c == '/') {
-                inNumerator = false;
-            } else {
-                istream.putback(c);
-                break;
+        std::string input;
+        istream >> input;
+        size_t position = input.find('/');
+        if (position == std::string::npos) {
+            try {
+                float value = std::stof(input);
+                other = Fraction(value);
+                return istream;
+            } catch (std::invalid_argument &) {
+                std::cout << "error parsing string" << std::endl;
             }
         }
-
-        numerator *= sign;
-
-        if (denominator == 0) {
-            throw std::invalid_argument("Invalid fraction: division by zero");
+        try {
+            int numerator = std::stoi(input.substr(0, position));
+            int denominator = std::stoi(input.substr(position + 1));
+            if (numerator < 0 && denominator < 0) {
+                numerator = abs(numerator);
+                denominator = abs(denominator);
+            }
+            other = Fraction(numerator, denominator);
         }
-
-        other = Fraction(numerator, denominator);
-
+        catch (std::invalid_argument &) {
+            std::cout << "error parsing string" << std::endl;
+        }
         return istream;
     }
 
+    /**
+     * calculate the LCM of a fraction
+     * @param num numerator
+     * @param den denominator
+     * @return the LCM result
+     */
     int Fraction::LCM(int num, int den) {
         return num * (den / GCD(num, den));
     }
 
+    /**
+     * calculate the GCD of a fraction
+     * @param num numerator
+     * @param den denominator
+     * @return the GCD result
+     */
     int Fraction::GCD(int num, int den) {
         while (den != 0) {
             int temp = den;
@@ -381,11 +456,24 @@ namespace ariel {
         return num;
     }
 
-    void Fraction::setGCDAndLCM() {
-        if (gcdVal == 0 || lcmVal == 0) {
-            gcdVal = GCD(numerator, denominator);
-            lcmVal = LCM(numerator, denominator);
+    /**
+     * change a fraction to the reduced form
+     */
+    void Fraction::reduce() {
+        if (numerator == 0) {
+            denominator = 1;
+            gcdVal = 1;
+            lcmVal = 0;
+            return;
+        }
+        int gcd = GCD(abs(numerator), denominator);
+        numerator /= gcd;
+        denominator /= gcd;
+        gcdVal = gcd;
+        lcmVal = LCM(abs(numerator), denominator);
+        if (numerator < 0 && denominator < 0) {
+            numerator = -numerator;
+            denominator = -denominator;
         }
     }
-
 }
