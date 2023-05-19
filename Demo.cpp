@@ -1,10 +1,3 @@
-/**
- * Demo file for the exercise on binary tree
- *
- * @author Evgeny Hershkovitch Neiterman
- * @since 2023-03
- */
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -18,22 +11,26 @@ using namespace ariel;
 
 
 int main() {
-    const Fraction a(1, 1);
-    const Fraction b(1, 2);
-    Fraction ccc(1, 4);
-    Fraction ddd(3, 4);
+    Fraction a(5, 3), b(14, 21);
     cout << "a: " << a << "b: " << b << endl;
-    cout << "a+b " << a + b << endl;
-    cout << "a-b " << b - a << endl;
-    cout << "a/b " << a / b << endl;
-    cout << "a*b " << a * b << endl;
-    cout << "2.3*b " << 2.3 * b << endl;
-    cout << "a+2.421 " << a + 2.421 << endl;
+    float f = static_cast<float>(1) / 3;
+    Fraction d(1, 333);
+    cout << "d==f" << (d == f) << endl;
+    cout << "d==f" << (d) << endl;
+    cout << "d==f" << f << endl;
+    cout << "a+b" << a + b << endl;
+    cout << "a-b" << a - b << endl;
+    cout << "a/b" << a / b << endl;
+    cout << "a*b" << a * b << endl;
+    cout << "2.3*b" << 2.3 * b << endl;
+    cout << "a+2.421" << a + 2.421 << endl;
     Fraction c = a + b - 1;
     cout << c++ << endl;
     cout << --c << endl;
+
     cout << "c >=b ? : " << (c >= b) << endl;
     if (a > 1.1) cout << " a is bigger than 1.1" << endl;
     else cout << " a is smaller than 1.1" << endl;
+
 
 }

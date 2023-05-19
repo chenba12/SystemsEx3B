@@ -14,7 +14,6 @@ namespace ariel {
         int numerator;
         int denominator;
         int gcdVal;
-        int lcmVal;
     public:
         Fraction();
 
@@ -151,9 +150,11 @@ namespace ariel {
 
         void reduce();
 
-    private:
-        static int LCM(int num, int den);
+        int getNumerator() const;
 
+        int getDenominator() const;
+
+    private:
         static int GCD(int num, int den);
 
         Fraction fractionMinus(const Fraction &other) const;
