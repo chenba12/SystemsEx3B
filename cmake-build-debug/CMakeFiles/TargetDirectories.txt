@@ -1,0 +1,3 @@
+/home/chen/CLionProjects/Systems2Ex3B-master/cmake-build-debug/CMakeFiles/Systems2Ex3B_master.dir
+/home/chen/CLionProjects/Systems2Ex3B-master/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/chen/CLionProjects/Systems2Ex3B-master/cmake-build-debug/CMakeFiles/rebuild_cache.dir
