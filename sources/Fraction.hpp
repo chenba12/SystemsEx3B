@@ -1,7 +1,3 @@
-//
-// Created by chen on 4/14/23.
-//
-
 #ifndef SYSTEMSEX3A_FRACTION_H
 #define SYSTEMSEX3A_FRACTION_H
 
